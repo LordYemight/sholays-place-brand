@@ -1,16 +1,23 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Outfit, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const heading = Cormorant_Garamond({ 
+const outfit = Outfit({ 
   subsets: ["latin"], 
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "500", "700"],
   variable: "--font-heading" 
 });
 
-const body = Inter({ 
+const inter = Inter({ 
   subsets: ["latin"],
+  weight: ["300", "400"],
   variable: "--font-body"
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-mono"
 });
 
 export const metadata: Metadata = {
@@ -25,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${heading.variable} ${body.variable} font-sans`}>
+      <body className={`${outfit.variable} ${inter.variable} ${jetbrains.variable} font-body bg-steel-blue text-morning-cream`}>
         {children}
       </body>
     </html>

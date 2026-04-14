@@ -3,37 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --primary: #426A82;
-  --secondary: #F6F4F0;
-  --accent: #E87A1E;
+  --steel-blue: #426A82;
+  --morning-cream: #F6F4F0;
+  --charcoal: #333333;
+  --golden-ochre: #EEB134;
+  --burnt-orange: #E87A1E;
 }
 
 html { scroll-behavior: smooth; }
 body { 
   overflow-x: hidden; 
-  font-family: var(--font-body); 
-  background: var(--secondary); 
-  color: #1a1a1a; 
+  background: var(--steel-blue);
+  color: var(--morning-cream);
+  font-family: var(--font-body), sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4 { font-family: var(--font-heading); }
+h1, h2, h3, h4 { font-family: var(--font-heading), sans-serif; }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-@keyframes slide-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+/* Elegant Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--steel-blue); }
+::-webkit-scrollbar-thumb { background: rgba(246,244,240,0.2); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--golden-ochre); }
 
-.animate-fadeIn { animation: fadeIn 0.8s ease-out forwards; }
-.animate-slideUp { animation: slideUp 0.8s ease-out forwards; }
-.animate-scaleIn { animation: scaleIn 0.5s ease-out forwards; }
-.animate-float { animation: float 6s ease-in-out infinite; }
-.animate-slide-left { animation: slide-left 40s linear infinite; }
+::selection {
+  background: var(--golden-ochre);
+  color: var(--charcoal);
+}
+
+@keyframes load {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.animate-load { animation: load 1.5s infinite ease-in-out; }
 
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
-
-.bg-industrial-gradient {
-  background: linear-gradient(135deg, var(--primary) 0%, #2c4859 100%);
-}
