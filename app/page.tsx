@@ -3,31 +3,76 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { 
+  Box, 
   Printer, 
-  Package, 
+  Scaling, 
   Truck, 
-  PenTool, 
-  CheckCheck, 
   Menu, 
   X, 
   Instagram, 
   Mail, 
   Phone, 
   MapPin, 
+  CheckCheck,
   ImageOff,
-  Clock,
-  Users,
-  CheckCircle,
-  ChevronRight
+  ChevronRight,
+  ShieldCheck,
+  Cpu,
+  Palette
 } from 'lucide-react';
 
-// --- Types ---
-interface Stat { number: string; label: string; icon: string; }
-interface Feature { title: string; description: string; icon: string; }
-interface Product { name: string; description: string; price: string; image_url: string; }
-interface Testimonial { name: string; text: string; role: string; }
+const IMAGES = {
+  hero: "https://picsum.photos/seed/services0/1600/900",
+  products: [
+    "https://picsum.photos/seed/services2/800/600",
+    "https://picsum.photos/seed/services3/800/600",
+    "https://picsum.photos/seed/services4/800/600",
+    "https://picsum.photos/seed/services5/800/600"
+  ]
+};
 
-// --- Safe Image Component ---
+const BRAND = {
+  name: "Sholays Place Brand",
+  tagline: "The Masterpiece of Packaging.",
+  description: "Industrial excellence and sophisticated design for brands that demand precision and scale. We transform functional packaging into a brand's greatest asset through meticulous craftsmanship.",
+  industry: "services",
+  region: "Nigeria",
+  currency: "₦"
+};
+
+const navLinks = [
+  { name: "Work", href: "#products" },
+  { name: "Standards", href: "#features" },
+  { name: "About", href: "#about" },
+  { name: "Inquiry", href: "#contact" }
+];
+
+const features = [
+  { title: "Bespoke Engineering", description: "Every structure is custom-built to the exact dimensions of your product.", icon: Scaling },
+  { title: "Industrial Precision", description: "Automated cutting and folding systems ensure 100% consistency across units.", icon: Cpu },
+  { title: "Sophisticated Design", description: "An 'Apple-esque' approach to the aesthetics of physical printing.", icon: Palette },
+  { title: "Rapid Fulfillment", description: "Optimized logistics pipeline for Lagos-based businesses and beyond.", icon: Truck }
+];
+
+const products = [
+  { name: "Luxury Gift Boxes", description: "Custom-engineered rigid boxes with premium finishing and morning cream interiors.", price: "₦5,500" },
+  { name: "Bespoke Shopping Bags", description: "High-GSM reinforced paper bags featuring precision-stamped golden ochre branding.", price: "₦1,200" },
+  { name: "Industrial Product Sleeves", description: "Sleek, minimalist sleeves designed for tech and cosmetic hardware packaging.", price: "₦850" },
+  { name: "Branded Vinyl Roll", description: "Weather-resistant, industrial-grade adhesive stickers for large scale application.", price: "₦15,000" }
+];
+
+const testimonial = {
+  name: "Oluwaseun Adeyemi",
+  role: "CEO, Zenith Luxe",
+  text: "The level of sophistication in their steel blue finishes is unmatched in Lagos. They truly are the masters of the craft."
+};
+
+const stats = [
+  { number: "12+", label: "Years Experience" },
+  { number: "2k+", label: "Global Brands" },
+  { number: "1.5M+", label: "Annual Prints" }
+];
+
 function SafeImage({ src, alt, fill, width, height, className, priority }: {
   src: string; alt: string; fill?: boolean; width?: number; height?: number;
   className?: string; priority?: boolean;
@@ -35,24 +80,21 @@ function SafeImage({ src, alt, fill, width, height, className, priority }: {
   const [error, setError] = useState(false);
   if (error) {
     return (
-      <div className={`flex items-center justify-center bg-zinc-800 ${className}`}>
-        <ImageOff size={28} className="text-white/20" />
+      <div className={`flex items-center justify-center bg-zinc-200 ${className}`}>
+        <ImageOff size={24} className="text-zinc-400" />
       </div>
     );
   }
   return (
-    <Image 
-      src={src} alt={alt} fill={fill}
+    <Image src={src} alt={alt} fill={fill}
       width={!fill ? (width ?? 800) : undefined}
       height={!fill ? (height ?? 600) : undefined}
       className={className} priority={priority}
-      onError={() => setError(true)} 
-    />
+      onError={() => setError(true)} />
   );
 }
 
-// --- Hooks ---
-const useScrollReveal = (threshold = 0.1) => {
+const useScrollReveal = (threshold = 0.15) => {
   const ref = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
@@ -66,33 +108,19 @@ const useScrollReveal = (threshold = 0.1) => {
   return { ref, isVisible };
 };
 
-const useTypewriter = (text: string, speed = 60) => {
-  const [display, setDisplay] = useState('');
-  useEffect(() => {
-    let i = 0;
-    const timer = setInterval(() => {
-      if (i < text.length) { setDisplay(prev => prev + text.charAt(i)); i++; }
-      else clearInterval(timer);
-    }, speed);
-    return () => clearInterval(timer);
-  }, [text, speed]);
-  return display;
-};
-
-// --- Icons Mapping ---
-const iconMap: Record<string, React.ReactNode> = {
-  Printer: <Printer size={24} />,
-  Package: <Package size={24} />,
-  Globe: <Truck size={24} />,
-  PenTool: <PenTool size={24} />,
-  CheckCircle: <CheckCircle size={24} />,
-  Users: <Users size={24} />,
-  Clock: <Clock size={24} />
-};
-
-export default function Home() {
+export default function Page() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const heroRev = useScrollReveal(0.1);
+  const featRev = useScrollReveal(0.15);
+  const prodRev = useScrollReveal(0.15);
+  const aboutRev = useScrollReveal(0.15);
+  const testRev = useScrollReveal(0.15);
+  const contactRev = useScrollReveal(0.1);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -100,404 +128,342 @@ export default function Home() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const brand = {
-    name: "Sholays Place Brand",
-    tagline: "The Hub of Premium Packaging & Printing.",
-    description: "Based in the heart of Shomolu, Lagos, we deliver top-tier printing and custom packaging solutions to brands worldwide. From custom stickers to corporate branding, we define quality.",
-    industry: "Services",
-    region: "Nigeria"
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => { setLoading(false); setSent(true); }, 1200);
   };
-
-  const contact = {
-    whatsapp: "+2348087722602",
-    instagram: "sholaysplace_brand",
-    email: "",
-    address: "Shomolu, Lagos, Nigeria"
-  };
-
-  const products: Product[] = [
-    { name: "Custom Die-Cut Stickers", description: "High-gloss, weather-resistant stickers for product labeling and branding.", price: "₦12,500", image_url: "https://picsum.photos/seed/sholays1/800/1000" },
-    { name: "Branded Nylon Bags", description: "Premium printed packaging bags available in various sizes and thicknesses.", price: "₦45,000", image_url: "https://picsum.photos/seed/sholays2/800/1000" },
-    { name: "Corporate Identity Cards", description: "Professional PVC cards with high-fidelity color printing and lamination.", price: "₦25,000", image_url: "https://picsum.photos/seed/sholays3/800/1000" },
-    { name: "Premium Branded Aprons", description: "Durable fabric aprons with custom screen-printed or embroidered logos.", price: "₦18,000", image_url: "https://picsum.photos/seed/sholays4/800/1000" }
-  ];
-
-  const features: Feature[] = [
-    { title: "Precision Printing", description: "Sharp, vibrant, and accurate colors using industry-leading machinery in Shomolu.", icon: "Printer" },
-    { title: "Bespoke Packaging", description: "Customized nylon bags and stickers tailored to your brand's unique identity.", icon: "Package" },
-    { title: "Global Shipping", description: "Swift worldwide shipping through DHL to ensure your brand reaches every corner.", icon: "Globe" },
-    { title: "Creative Edge", description: "Professional design consultation to bring your creative vision to life.", icon: "PenTool" }
-  ];
-
-  const testimonials: Testimonial[] = [
-    { name: "Tunde Bakare", text: "The nylon bags were top-notch. Best printing quality I have seen in Shomolu.", role: "CEO, Bakare Ventures" },
-    { name: "Adesua Okonjo", text: "My custom stickers arrived in London via DHL in perfect condition. Incredible service!", role: "Founder, Luxe Beauty" },
-    { name: "Chidi Eze", text: "Sholays Place transformed our corporate branding. The T-shirts and cards are professional.", role: "Marketing Director" }
-  ];
-
-  const typedHero = useTypewriter("PRINTING. PACKAGING. BRANDING.");
-
-  const fReveal = useScrollReveal();
-  const aReveal = useScrollReveal();
-  const pReveal = useScrollReveal();
-  const tReveal = useScrollReveal();
-  const cReveal = useScrollReveal();
 
   return (
-    <main className="relative min-h-screen">
-      
-      {/* Header */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-secondary/95 backdrop-blur-lg border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary flex items-center justify-center font-black text-white text-xl rounded">S</div>
-            <span className="font-heading text-xl font-black text-white tracking-tighter hidden sm:block">SHOLAYS PLACE</span>
-          </div>
-          
+    <main className="relative">
+      {/* Navigation */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? 'bg-white shadow-md py-4' : 'bg-transparent py-6'
+      }`}>
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          <a href="#" className="flex items-center gap-2 group">
+            <div className="w-10 h-10 bg-primary flex items-center justify-center text-white font-heading font-black text-xl">
+              S
+            </div>
+            <span className={`font-heading font-black text-lg tracking-tighter ${
+              scrolled ? 'text-primary' : 'text-white'
+            }`}>
+              SHOLAYS
+            </span>
+          </a>
+
           <div className="hidden md:flex items-center gap-10">
-            {['Home', 'Services', 'Products', 'Contact'].map((item) => (
-              <a key={item} href={`#${item.toLowerCase()}`} className="text-sm font-medium text-white/70 hover:text-primary transition-colors">
-                {item}
+            {navLinks.map(link => (
+              <a key={link.name} href={link.href} className={`text-sm font-bold tracking-widest uppercase transition-colors ${
+                scrolled ? 'text-zinc-600 hover:text-accent' : 'text-white/80 hover:text-accent'
+              }`}>
+                {link.name}
               </a>
             ))}
-            <a href="#contact" className="bg-primary px-6 py-2 rounded-full text-sm font-bold text-white hover:brightness-110 transition-all">
-              Start Your Project
+            <a href="#contact" className="bg-accent text-white px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 transition-all">
+              Start Project
             </a>
           </div>
 
-          <button className="md:hidden text-white" onClick={() => setMenuOpen(true)}>
-            <Menu size={28} />
+          <button className="md:hidden" onClick={() => setIsMenuOpen(true)}>
+            <Menu className={scrolled ? 'text-primary' : 'text-white'} />
           </button>
         </div>
       </nav>
 
       {/* Mobile Sidebar */}
-      <div className={`fixed inset-0 z-[60] bg-black/60 transition-opacity ${menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setMenuOpen(false)}>
-        <div className={`absolute right-0 top-0 h-full w-[80%] max-w-sm bg-secondary p-8 flex flex-col transition-transform duration-500 ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`} onClick={e => e.stopPropagation()}>
-          <div className="flex justify-between items-center mb-12">
-            <span className="font-black text-primary text-2xl">S_P</span>
-            <button onClick={() => setMenuOpen(false)}><X size={32} className="text-white" /></button>
-          </div>
-          <div className="flex flex-col gap-6">
-            {['Home', 'Services', 'Products', 'Contact'].map((item) => (
-              <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMenuOpen(false)} className="text-3xl font-heading font-bold text-white">
-                {item}
+      <div className={`fixed inset-0 z-[60] transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} />
+        <div className="absolute right-0 top-0 h-full w-[80%] max-w-sm bg-primary p-10 flex flex-col">
+          <button className="self-end text-white mb-12" onClick={() => setIsMenuOpen(false)}>
+            <X size={32} />
+          </button>
+          <div className="flex flex-col gap-8">
+            {navLinks.map(link => (
+              <a key={link.name} href={link.href} className="text-white font-heading text-3xl font-black" onClick={() => setIsMenuOpen(false)}>
+                {link.name}
               </a>
             ))}
+            <a href="#contact" className="bg-accent text-white py-4 rounded-xl text-center font-bold text-lg mt-8" onClick={() => setIsMenuOpen(false)}>
+              Start Project
+            </a>
           </div>
-          <div className="mt-auto space-y-4">
-            <p className="text-white/40 text-sm tracking-widest uppercase">Connect</p>
-            <div className="flex gap-4">
-              <a href="#" className="p-3 bg-white/5 rounded-full text-white hover:bg-primary transition-colors"><Instagram size={20} /></a>
-              <a href="#" className="p-3 bg-white/5 rounded-full text-white hover:bg-primary transition-colors"><Phone size={20} /></a>
-            </div>
+          <div className="mt-auto">
+            <p className="text-white/40 text-sm font-mono uppercase tracking-widest">Connect</p>
+            <a href="https://instagram.com/sholaysplace_brand" target="_blank" className="text-white flex items-center gap-2 mt-2">
+              <Instagram size={18} /> @sholaysplace_brand
+            </a>
           </div>
         </div>
       </div>
 
-      {/* Hero Section (Pattern: HR-D) */}
-      <section id="home" className="min-h-screen flex flex-col justify-center bg-secondary px-6 overflow-hidden relative pt-20">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:64px_64px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-        
-        <div className="relative z-10 max-w-7xl mx-auto w-full">
-          <h1 className="font-heading text-[12vw] md:text-[8.5vw] font-black text-white leading-none tracking-tighter">
-            {typedHero}<span className="text-primary animate-pulse">_</span>
+      {/* Hero: HR-B */}
+      <section id="home" className="min-h-screen relative flex items-end pb-24 px-6 md:px-16 overflow-hidden bg-primary">
+        <SafeImage src={IMAGES.hero} alt="Packaging Masterpiece" fill className="object-cover opacity-60" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/40 to-transparent" />
+        <div className="relative z-10 max-w-4xl">
+          <h1 className={`font-heading text-6xl md:text-[7.5rem] font-black text-white leading-[0.9] tracking-tighter transition-all duration-1000 ${
+            heroRev.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+          }`}>
+            {BRAND.tagline}
           </h1>
-          <div className="mt-12 flex flex-col md:flex-row items-start md:items-end justify-between gap-8 border-t border-white/10 pt-10">
-            <p className="text-white/60 text-lg md:text-xl max-w-xl leading-relaxed">
-              {brand.description}
-            </p>
-            <div className="flex flex-col gap-4">
-              <a href="#contact" className="bg-primary text-white px-10 py-5 font-black text-lg
-                shadow-[8px_8px_0px_rgba(238,177,52,0.3)]
-                hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[4px_4px_0px_rgba(238,177,52,0.3)]
-                transition-all duration-200 shrink-0 uppercase">
-                Start Project
-              </a>
-              <p className="text-accent font-mono text-xs uppercase tracking-[0.3em] font-bold">Nigeria & Worldwide Delivery</p>
+          <p className="text-white/80 mt-8 text-xl max-w-2xl leading-relaxed font-medium">
+            Merging industrial scale with the precision of high-end design. Elevate your brand&apos;s physical presence in every unboxing.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-6 mt-12">
+            <a href="#contact" className="bg-accent text-white px-10 py-5 font-black text-lg hover:brightness-110 transition-all rounded-full flex items-center justify-center gap-2 shadow-2xl">
+              Start Project <ChevronRight size={20} />
+            </a>
+            <a href="#products" className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-10 py-5 font-bold text-lg hover:bg-white/20 transition-all rounded-full text-center">
+              View Collection
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" ref={aboutRev.ref} className="py-28 px-6 bg-secondary">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className={`transition-all duration-1000 ${aboutRev.isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
+              <span className="text-accent font-mono text-xs tracking-[0.4em] uppercase mb-4 block">Legacy Hub</span>
+              <h2 className="font-heading text-5xl font-black text-primary leading-tight">The Standard of Shomolu</h2>
+              <p className="text-zinc-600 mt-6 text-lg leading-relaxed">
+                Located in the heart of Nigeria&apos;s printing hub, Sholays Place Brand combines local heritage with global design standards to create the &quot;Apple&quot; of packaging services.
+              </p>
+              <p className="text-zinc-500 mt-4 italic font-medium">
+                Sharp delivery, nationwide.
+              </p>
+            </div>
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 transition-all duration-1000 delay-300 ${aboutRev.isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
+              <div className="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm">
+                <Box className="text-accent mb-4" size={32} />
+                <h3 className="font-heading text-xl font-bold">Luxe Finish</h3>
+                <p className="text-zinc-500 text-sm mt-2">Premium coating and textures for high-end retail.</p>
+              </div>
+              <div className="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm">
+                <ShieldCheck className="text-primary mb-4" size={32} />
+                <h3 className="font-heading text-xl font-bold">Durability</h3>
+                <p className="text-zinc-500 text-sm mt-2">Reinforced structures built for logistics stress.</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Divider */}
-      <div className="py-10 border-y border-white/5 bg-secondary">
-        <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-12">
-          {['SHOMOLU', 'QUALITY', 'GLOBAL', 'FAST', 'RELIABLE'].map((word, i) => (
-            <div key={i} className="flex items-center gap-3 text-white/20 text-xs font-mono tracking-widest uppercase">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-              {word}
+      {/* D-STAT Divider */}
+      <div className="bg-accent py-16">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/20 text-center">
+          {stats.map((s, i) => (
+            <div key={i} className="px-8 py-6 md:py-0">
+              <p className="text-5xl font-black text-white tracking-tighter">{s.number}</p>
+              <p className="text-white/80 text-sm mt-2 font-bold uppercase tracking-widest">{s.label}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Features Section (Pattern: F-ICON-GRID) */}
-      <section id="services" ref={fReveal.ref} className="py-32 px-6 bg-secondary relative">
-        <div className="max-w-7xl mx-auto">
-          <div className={`mb-20 transition-all duration-1000 ${fReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-            <h2 className="font-heading text-5xl md:text-7xl font-black text-white mb-6 uppercase leading-none">Expert Solutions</h2>
-            <p className="text-white/40 text-lg max-w-md">Why leading brands choose Sholays Place for their printing needs. Sharp delivery, nationwide.</p>
+      {/* Products: P-LIST */}
+      <section id="products" ref={prodRev.ref} className="py-28 px-6 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-accent font-mono text-xs tracking-[0.4em] uppercase mb-4 block">Collection</span>
+            <h2 className="font-heading text-5xl font-black text-primary">The Collection</h2>
+            <p className="text-zinc-400 mt-2 text-sm font-bold tracking-[0.2em] uppercase">01 — Numbered Packaging Categories</p>
           </div>
-          
+          <div className="space-y-4">
+            {products.map((p, i) => (
+              <div key={i} className={`group flex items-center gap-6 p-8 rounded-2xl border border-zinc-100
+                hover:border-accent/40 hover:bg-accent/5 transition-all duration-300 ${
+                  prodRev.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+                style={{ transitionDelay: `${i * 150}ms` }}>
+                <span className="font-heading text-zinc-100 text-6xl font-black tracking-tighter w-20 shrink-0 group-hover:text-accent/10 transition-colors">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="flex-1">
+                  <h3 className="font-heading text-2xl font-bold text-primary">{p.name}</h3>
+                  <p className="text-zinc-500 mt-1 text-base">{p.description}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="font-black text-2xl text-accent">{p.price}</p>
+                  <a href="#contact" className="text-xs font-bold text-zinc-400 group-hover:text-primary transition-colors mt-2 block uppercase tracking-widest underline decoration-accent/30 underline-offset-4">Inquire</a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features: F-ICON-GRID */}
+      <section id="features" ref={featRev.ref} className="py-28 px-6 bg-primary">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-20">
+            <h2 className="font-heading text-5xl font-black text-white">Precision and Scale</h2>
+            <p className="text-white/50 text-xl mt-4">How we redefine industrial excellence.</p>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {features.map((f, i) => (
-              <div key={i} 
-                style={{ transitionDelay: `${i * 100}ms` }}
-                className={`p-10 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-primary/5 hover:border-primary/30 transition-all duration-500 group cursor-default
-                ${fReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-                <div className="mb-8 text-primary group-hover:scale-110 transition-transform w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl">
-                  {iconMap[f.icon]}
+            {features.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <div key={i} className={`p-10 rounded-3xl bg-white/5 border border-white/10
+                  hover:bg-accent hover:border-accent transition-all duration-500 group cursor-default ${
+                    featRev.isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                  }`}
+                  style={{ transitionDelay: `${i * 100}ms` }}>
+                  <Icon className="text-accent group-hover:text-white mb-8 transition-colors" size={40} />
+                  <h3 className="font-heading font-black text-white text-2xl leading-tight mb-4">{f.title}</h3>
+                  <p className="text-white/60 group-hover:text-white/90 text-sm leading-relaxed">{f.description}</p>
                 </div>
-                <h3 className="font-heading font-black text-white text-2xl leading-tight mb-4 uppercase">{f.title}</h3>
-                <p className="text-white/40 text-base leading-relaxed">{f.description}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* About Section (Split Layout) */}
-      <section ref={aReveal.ref} className="py-32 px-6 bg-zinc-900 overflow-hidden">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
-          <div className={`transition-all duration-1000 ${aReveal.isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
-            <p className="text-primary font-mono text-sm tracking-widest uppercase mb-6 font-bold">About Sholays Place</p>
-            <h2 className="font-heading text-5xl md:text-6xl font-black text-white leading-tight mb-8">THE PRINTING CAPITAL&apos;S FINEST</h2>
-            <p className="text-white/60 text-xl leading-relaxed mb-10">
-              Located in Shomolu, Lagos, we stand at the intersection of tradition and modern innovation. We don&apos;t just print; we build brand identities that command attention across the globe.
+      {/* Testimonials: T-SPOTLIGHT */}
+      <section ref={testRev.ref} className="py-28 px-6 bg-secondary">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="font-heading text-5xl font-black text-primary mb-16">Industry Voice</h2>
+          <div className={`relative py-16 px-10 rounded-[3rem] border border-zinc-200 bg-white shadow-xl transition-all duration-1000 ${
+            testRev.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+          }`}>
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-accent flex items-center justify-center shadow-lg">
+              <span className="text-white text-3xl font-black leading-none mt-2">&ldquo;</span>
+            </div>
+            <p className="text-primary text-2xl md:text-3xl leading-relaxed italic font-medium">
+              &ldquo;{testimonial.text}&rdquo;
             </p>
-            <div className="flex flex-wrap gap-4">
-              <div className="bg-secondary p-4 border border-white/10 rounded-xl flex items-center gap-4">
-                <div className="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center text-accent"><CheckCircle size={24} /></div>
-                <div>
-                  <p className="text-white font-bold text-lg">100%</p>
-                  <p className="text-white/40 text-xs uppercase tracking-tighter">Print Quality</p>
-                </div>
+            <div className="mt-10 flex items-center justify-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-xl border-2 border-primary/20">
+                {testimonial.name.charAt(0)}
               </div>
-              <div className="bg-secondary p-4 border border-white/10 rounded-xl flex items-center gap-4">
-                <div className="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center text-accent"><Users size={24} /></div>
-                <div>
-                  <p className="text-white font-bold text-lg">5000+</p>
-                  <p className="text-white/40 text-xs uppercase tracking-tighter">Happy Clients</p>
-                </div>
+              <div className="text-left">
+                <p className="font-heading font-black text-primary text-lg">{testimonial.name}</p>
+                <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest">{testimonial.role}</p>
               </div>
-            </div>
-          </div>
-          <div className={`relative aspect-square transition-all duration-1000 delay-300 ${aReveal.isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
-            <div className="absolute inset-0 bg-primary/20 -rotate-6 rounded-3xl" />
-            <div className="relative h-full w-full rounded-3xl overflow-hidden border border-white/10">
-              <SafeImage src="https://picsum.photos/seed/sholays5/1000/1000" alt="About" fill className="object-cover" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Products Section (Pattern: P-STAGGER) */}
-      <section id="products" ref={pReveal.ref} className="py-32 bg-secondary px-6 overflow-hidden">
-        <div className="max-w-7xl mx-auto mb-24">
-          <h2 className={`font-heading text-6xl md:text-8xl font-black text-white leading-none uppercase mb-4 transition-all duration-700 ${pReveal.isVisible ? 'opacity-100 skew-y-0 translate-y-0' : 'opacity-0 skew-y-2 translate-y-8'}`}>
-            Our Collection
-          </h2>
-          <p className="text-white/30 font-mono tracking-widest uppercase">Premium products crafted for excellence</p>
-        </div>
-
-        <div className="max-w-6xl mx-auto space-y-40">
-          {products.map((p, i) => (
-            <div key={i} className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-12 md:gap-24 transition-all duration-1000 ${pReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
-              <div className="w-full md:w-1/2 relative group">
-                <div className="aspect-[4/5] relative rounded-2xl overflow-hidden shadow-2xl">
-                  <SafeImage src={p.image_url} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+      {/* Contact: C2 */}
+      <section id="contact" ref={contactRev.ref} className="relative overflow-hidden py-32 bg-primary">
+        <div className="absolute inset-0 bg-accent" />
+        <div className="absolute inset-0 bg-primary [clip-path:polygon(0_0,65%_0,45%_100%,0_100%)] hidden md:block" />
+        <div className="relative z-10 max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
+          <div className={`transition-all duration-1000 ${contactRev.isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
+            <h2 className="font-heading text-7xl font-black text-white leading-none">Begin the Masterpiece</h2>
+            <p className="text-white/70 mt-8 text-xl max-w-sm font-medium">Elevate your product experience. Speak with our design engineers today.</p>
+            <div className="mt-12 space-y-6">
+              <div className="flex items-center gap-4 text-white group">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-accent transition-colors">
+                  <MapPin size={20} />
                 </div>
-                <div className={`absolute -bottom-8 ${i % 2 === 0 ? '-right-8' : '-left-8'} w-full h-full bg-primary/10 rounded-2xl -z-10`} />
+                <span className="font-bold">Shomolu, Lagos, Nigeria</span>
               </div>
-              <div className={`w-full md:w-1/2 ${i % 2 === 0 ? 'text-left' : 'md:text-right'}`}>
-                <span className="font-mono text-accent text-sm font-bold tracking-[0.4em] uppercase mb-6 block">0{i + 1} Featured Product</span>
-                <h3 className="font-heading text-4xl md:text-6xl font-black text-white leading-tight mb-6 uppercase">{p.name}</h3>
-                <p className="text-white/50 text-xl leading-relaxed mb-8">{p.description}</p>
-                <div className={`flex flex-col gap-6 ${i % 2 === 0 ? 'items-start' : 'items-start md:items-end'}`}>
-                  <span className="text-4xl font-black text-primary">{p.price}</span>
-                  <a href="#contact" className="group flex items-center gap-3 bg-white text-black px-8 py-4 rounded-full font-black text-sm uppercase hover:bg-primary hover:text-white transition-all">
-                    Order Now <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </a>
+              <a href="https://instagram.com/sholaysplace_brand" target="_blank" className="flex items-center gap-4 text-white group">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-accent transition-colors">
+                  <Instagram size={20} />
                 </div>
-              </div>
+                <span className="font-bold">@sholaysplace_brand</span>
+              </a>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Testimonials (Pattern: T-SLIDER) */}
-      <section ref={tReveal.ref} className="py-32 bg-zinc-900 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 mb-16">
-          <h2 className="font-heading text-5xl md:text-7xl font-black text-white uppercase">Client Feedback</h2>
-        </div>
-        <div className="w-full overflow-hidden">
-          <div className="flex w-[200%] gap-6 animate-slide-left hover:[animation-play-state:paused]">
-            {[...testimonials, ...testimonials].map((t, i) => (
-              <div key={i} className="w-80 md:w-[450px] shrink-0 bg-secondary border border-white/5 rounded-[2rem] p-10 flex flex-col justify-between">
-                <div>
-                  <div className="flex gap-1.5 mb-8">
-                    {[1,2,3,4,5].map(n => <div key={n} className="w-2.5 h-2.5 rounded-full bg-accent" />)}
-                  </div>
-                  <p className="text-white/80 text-lg md:text-xl leading-relaxed italic mb-10">&ldquo;{t.text}&rdquo;</p>
-                </div>
-                <div className="flex items-center gap-4 border-t border-white/10 pt-8">
-                  <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-white font-black text-xl">
-                    {t.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-black text-white text-lg">{t.name}</p>
-                    <p className="text-white/40 text-sm uppercase tracking-widest">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
-        </div>
-      </section>
 
-      {/* Contact Section (Pattern: C4) */}
-      <section id="contact" ref={cReveal.ref} className="py-32 px-6 bg-accent">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="font-heading text-[12vw] md:text-[8vw] font-black text-secondary leading-none mb-16 uppercase transition-all duration-700">
-            Get a Quote
-          </h2>
-          <div className={`grid md:grid-cols-[1fr_1.5fr] gap-20 items-start border-t-4 border-secondary/20 pt-16 transition-all duration-1000 ${cReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-            <div className="space-y-8">
-              <p className="text-secondary font-black text-2xl uppercase leading-tight max-w-xs">Let&apos;s build something remarkable together.</p>
-              <div className="space-y-4">
-                <a href={`https://wa.me/${contact.whatsapp.replace(/\+/g,'')}`} className="flex items-center gap-4 text-secondary/70 hover:text-secondary transition-colors font-bold text-lg group">
-                  <Phone size={24} className="group-hover:rotate-12 transition-transform" />
-                  {contact.whatsapp}
-                </a>
-                <a href="#" className="flex items-center gap-4 text-secondary/70 hover:text-secondary transition-colors font-bold text-lg group">
-                  <Instagram size={24} className="group-hover:scale-110 transition-transform" />
-                  @{contact.instagram}
-                </a>
-                <div className="flex items-start gap-4 text-secondary/70 font-bold text-lg">
-                  <MapPin size={24} className="shrink-0" />
-                  {contact.address}
+          <div className={`transition-all duration-1000 delay-300 ${contactRev.isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
+            <div className="bg-zinc-900/40 backdrop-blur-xl rounded-[2.5rem] p-10 border border-white/10 shadow-2xl">
+              {sent ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center animate-scaleIn">
+                  <div className="w-20 h-20 rounded-full bg-accent/20 flex items-center justify-center mb-6 border border-accent/30">
+                    <CheckCheck size={40} className="text-accent" />
+                  </div>
+                  <h3 className="font-heading text-3xl font-black text-white">Project Initiated</h3>
+                  <p className="text-white/60 mt-4 max-w-xs text-lg">Our master craftsmen will reach out to you within 24 hours.</p>
                 </div>
-              </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {(['name', 'email', 'phone'] as const).map(field => (
+                    <input key={field}
+                      type={field === 'email' ? 'email' : 'text'}
+                      placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                      value={form[field]}
+                      onChange={e => setForm(prev => ({ ...prev, [field]: e.target.value }))}
+                      required={field !== 'phone'}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4
+                        text-white placeholder-white/30 text-base outline-none
+                        focus:border-accent focus:bg-white/10 transition-all" />
+                  ))}
+                  <textarea rows={4} placeholder="Detailed project requirements..."
+                    value={form.message}
+                    onChange={e => setForm(prev => ({ ...prev, message: e.target.value }))}
+                    required
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4
+                      text-white placeholder-white/30 text-base outline-none resize-none
+                      focus:border-accent focus:bg-white/10 transition-all" />
+                  <button type="submit" disabled={loading}
+                    className="w-full bg-accent text-white py-5 rounded-2xl font-black text-xl
+                      hover:brightness-110 shadow-xl transition-all duration-300 disabled:opacity-60">
+                    {loading ? 'Transmitting...' : 'Send Inquiry'}
+                  </button>
+                </form>
+              )}
             </div>
-
-            <ContactForm />
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-secondary pt-32 pb-12 px-6 border-t border-white/5">
+      <footer className="bg-zinc-950 py-20 px-6 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-12 h-12 bg-primary flex items-center justify-center font-black text-white text-2xl rounded-lg">S</div>
-                <span className="font-heading text-2xl font-black text-white tracking-tighter uppercase">SHOLAYS PLACE</span>
+              <div className="flex items-center gap-2 mb-8">
+                <div className="w-10 h-10 bg-primary flex items-center justify-center text-white font-heading font-black text-xl">
+                  S
+                </div>
+                <span className="font-heading font-black text-2xl text-white tracking-tighter">
+                  SHOLAYS PLACE BRAND
+                </span>
               </div>
-              <p className="text-white/40 text-lg max-w-sm leading-relaxed mb-8">
-                {brand.description}
+              <p className="text-zinc-500 max-w-md text-lg leading-relaxed">
+                {BRAND.description}
               </p>
-              <div className="flex gap-4">
-                <a href="#" className="p-3 bg-white/5 rounded-full text-white hover:bg-primary transition-all"><Instagram size={20} /></a>
-                <a href="#" className="p-3 bg-white/5 rounded-full text-white hover:bg-primary transition-all"><Mail size={20} /></a>
-              </div>
             </div>
-            
             <div>
-              <p className="text-white font-black text-lg mb-8 uppercase tracking-widest">Navigation</p>
-              <div className="flex flex-col gap-4">
-                {['Home', 'Services', 'Products', 'Contact'].map(item => (
-                  <a key={item} href={`#${item.toLowerCase()}`} className="text-white/40 hover:text-primary transition-colors">{item}</a>
+              <h4 className="font-heading font-black text-white uppercase tracking-widest text-sm mb-6">Navigation</h4>
+              <ul className="space-y-4">
+                {navLinks.map(link => (
+                  <li key={link.name}>
+                    <a href={link.href} className="text-zinc-400 hover:text-accent transition-colors font-medium">
+                      {link.name}
+                    </a>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
-
             <div>
-              <p className="text-white font-black text-lg mb-8 uppercase tracking-widest">Global Ops</p>
-              <div className="flex flex-col gap-4">
-                <p className="text-white/40">Shomolu Production Hub</p>
-                <p className="text-white/40">Lagos Head Office</p>
-                <p className="text-white/40">DHL Express Partner</p>
+              <h4 className="font-heading font-black text-white uppercase tracking-widest text-sm mb-6">HQ</h4>
+              <p className="text-zinc-400 leading-relaxed font-medium">
+                Shomolu, Lagos,<br />Nigeria
+              </p>
+              <div className="mt-8 flex gap-4">
+                <a href="https://instagram.com/sholaysplace_brand" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-accent transition-all">
+                  <Instagram size={20} />
+                </a>
               </div>
             </div>
           </div>
-
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8 pt-12 border-t border-white/5 text-white/20 text-xs font-mono tracking-widest uppercase">
-            <p>&copy; {new Date().getFullYear()} {brand.name}. All Rights Reserved.</p>
-            <div className="flex gap-8">
-              <span>Built for Brands</span>
-              <span>Lagos, Nigeria</span>
-            </div>
+          <div className="mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p className="text-zinc-500 text-sm font-medium">
+              &copy; {new Date().getFullYear()} Sholays Place Brand. All rights reserved.
+            </p>
+            <p className="text-zinc-600 text-xs font-mono uppercase tracking-[0.3em]">
+              The Standard of Shomolu
+            </p>
           </div>
         </div>
       </footer>
-
     </main>
-  );
-}
-
-function ContactForm() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
-  const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => { setLoading(false); setSent(true); }, 1500);
-  };
-
-  if (sent) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center animate-scaleIn bg-secondary/10 rounded-[2rem] border border-secondary/20">
-        <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mb-8 border border-white/10 shadow-xl">
-          <CheckCheck size={40} className="text-accent" />
-        </div>
-        <h3 className="font-heading text-3xl font-black text-secondary uppercase">Project Received</h3>
-        <p className="text-secondary/60 mt-4 max-w-xs font-bold">Our print specialists in Shomolu will reach out within 24 hours.</p>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid sm:grid-cols-2 gap-6">
-        {(['name', 'email', 'phone'] as const).map(field => (
-          <div key={field} className={field === 'phone' ? 'sm:col-span-2' : ''}>
-            <input
-              type={field === 'email' ? 'email' : 'text'}
-              placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-              value={form[field]}
-              onChange={e => setForm(prev => ({ ...prev, [field]: e.target.value }))}
-              required={field !== 'phone'}
-              className="w-full bg-secondary/5 border-2 border-secondary/20 rounded-2xl px-6 py-4
-                text-secondary placeholder-secondary/40 text-lg font-bold outline-none
-                focus:border-secondary focus:bg-white/10 transition-all"
-            />
-          </div>
-        ))}
-      </div>
-      <textarea
-        rows={5}
-        placeholder="Tell us about your project requirements..."
-        value={form.message}
-        onChange={e => setForm(prev => ({ ...prev, message: e.target.value }))}
-        required
-        className="w-full bg-secondary/5 border-2 border-secondary/20 rounded-2xl px-6 py-4
-          text-secondary placeholder-secondary/40 text-lg font-bold outline-none resize-none
-          focus:border-secondary focus:bg-white/10 transition-all"
-      />
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-secondary text-white py-6 rounded-2xl font-black text-xl uppercase tracking-widest
-          hover:scale-[1.02] active:scale-95 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed
-          shadow-2xl"
-      >
-        {loading ? 'Processing...' : 'Send Inquiry'}
-      </button>
-    </form>
   );
 }

@@ -3,25 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --primary: #E87A1E;
-  --secondary: #333333;
-  --accent: #EEB134;
+  --primary: #426A82;
+  --secondary: #F6F4F0;
+  --accent: #E87A1E;
 }
 
 html { scroll-behavior: smooth; }
-body { 
-  overflow-x: hidden; 
-  font-family: var(--font-body); 
-  background: var(--secondary); 
-  color: white; 
-}
-
-h1, h2, h3, h4 { font-family: var(--font-heading); }
+body { overflow-x: hidden; font-family: var(--font-body); background: var(--secondary); color: #1a1a1a; }
+h1,h2,h3,h4 { font-family: var(--font-heading); }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 @keyframes slide-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 .animate-fadeIn { animation: fadeIn 0.8s ease-out forwards; }

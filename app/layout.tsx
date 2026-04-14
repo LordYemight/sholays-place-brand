@@ -6,18 +6,14 @@ const heading = Space_Grotesk({ subsets: ["latin"], variable: "--font-heading" }
 const body = Inter({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata: Metadata = {
-  title: "Sholays Place Brand | Premium Packaging & Printing",
-  description: "Based in Shomolu, Lagos, we deliver top-tier printing and custom packaging solutions globally.",
+  title: "Sholays Place Brand | The Masterpiece of Packaging",
+  description: "Industrial excellence and sophisticated packaging design based in Lagos, Nigeria.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${heading.variable} ${body.variable} font-sans`}>
+      <body className={`${heading.variable} ${body.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>
